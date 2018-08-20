@@ -23,9 +23,8 @@ class Footer extends Component {
             </ul>
           </nav>
           <p className="copyright pull-right">
-            &copy; {new Date().getFullYear()}{" "}
-            <a href="http://www.creative-tim.com">Creative Tim</a>, made with
-            love for a better web
+            Made by José Reyna (<a href="#">@jobliz</a>) using &nbsp;
+            <a href="#">Light-Bootstrap-Dashboard-React</a>
           </p>
         </Grid>
       </footer>

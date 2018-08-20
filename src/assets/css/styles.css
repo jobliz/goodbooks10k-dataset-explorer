@@ -1,0 +1,21 @@
+.search-button-container {
+    float: right;
+}
+
+.search-result-listing-outer h4 {
+    margin-top: 0;
+}
+
+.search-result-listing span {
+    margin-right: 0.5em;
+    font-family: Mono;
+    font-size: 12px;
+}
+
+.search-result-listing .result-item {
+    margin-bottom: 2em;
+}
+
+.search-result-listing .present {
+    font-weight: bold;
+}

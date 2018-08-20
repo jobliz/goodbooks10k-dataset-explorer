@@ -7,13 +7,22 @@ import Maps from "views/Maps/Maps";
 import Notifications from "views/Notifications/Notifications";
 import Upgrade from "views/Upgrade/Upgrade";
 
+import TagSearch from "views/TagSearch/TagSearch";
+
 const dashboardRoutes = [
   {
-    path: "/dashboard",
+    path: "/dashboard", // "/dashboard",
     name: "Dashboard",
     icon: "pe-7s-graph",
     component: Dashboard
   },
+  {
+    path: "/search",
+    name: "Book search",
+    icon: "pe-7s-search",
+    component: TagSearch
+  },
+  /*
   {
     path: "/user",
     name: "User Profile",
@@ -47,6 +56,7 @@ const dashboardRoutes = [
     icon: "pe-7s-rocket",
     component: Upgrade
   },
+  */
   { redirect: true, path: "/", to: "/dashboard", name: "Dashboard" }
 ];
 
