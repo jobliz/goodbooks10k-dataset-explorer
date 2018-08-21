@@ -21,16 +21,15 @@ export default class TagSearch extends Component {
     this.props = props;
 
     this.state = {
-      tags: [], // length is zero when it hasn't been loaded
+      tags: [],
       filterOptions: null,
-      // TODO: title_search seems to not have effect at the start in the searchbox value?
       title_search: '',
       select_with: "",
       select_without: "",
       results: []
     };
 
-    this.ess = new ElasticSearchService('http://localhost:9200/goodbooks10k/books/_search');
+    this.ess = new ElasticSearchService('http://localhost:9200');
 
     this.handleSearchButton = this.handleSearchButton.bind(this);
     this.handleTitleSearchInput = this.handleTitleSearchInput.bind(this);
@@ -39,25 +38,34 @@ export default class TagSearch extends Component {
   }
 
   componentDidMount() {
+    this.loadTagsFromAggregation(); 
+  }
+
+  loadTagsFromAggregation() {
+    const check = /^([A-Za-z0-9_-]+)$/;
+
     this.ess.fetchTags().then((res) => {
       var new_tags = [];
-      
+
       res.data.aggregations.byTag.buckets.map((bucket) => {
         // tag 2385 in aggregation is "", which breaks the select. evade it
         if(bucket.key !== "") {
-          new_tags.push({
-            label: bucket.key, 
-            value: bucket.key,
-            type: 'name'
-          })
+          if(check.test(bucket.key)) {
+            new_tags.push({
+              label: bucket.key, 
+              value: bucket.key,
+              type: 'name'
+            });
+          }
         }
       });
 
       this.setState({'tags': new_tags}, () => {
-        this.setState({'filterOptions': createFilterOptions({
+        const filter_options = createFilterOptions({
           labelKey: 'label',
           options: this.state.tags
-        })});
+        });
+        this.setState({'filterOptions': filter_options}, () => {});
       });
     })
   }
@@ -110,7 +118,7 @@ export default class TagSearch extends Component {
     // -----------------
     var tag_search_fields;
 
-    if(this.state.tags.length !== 0) {
+    if(this.state.tags.length !== 0 && this.state.filterOptions !== null) {
       tag_search_fields = <div>
         <strong>With tags:</strong>
           <Select

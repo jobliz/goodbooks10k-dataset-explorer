@@ -1,17 +1,23 @@
 import axios from 'axios';
+import TagSearch from '../views/TagSearch/TagSearch';
 
 export default class ElasticSearchService {
 
-  constructor(endpoint) {
-    this.endpoint = endpoint;
+  constructor(host) {
+    this.tag_endpoint = host + '/goodbooks10k-tags/tags/_search';
+    this.book_endpoint = host + '/goodbooks10k/books/_search';
     this.fetchTags.bind(this);
     this.searchBooks.bind(this);
     this.queryForFetchingTags.bind(this);
     this.queryForSearchingBooks.bind(this);
   }
 
+  listTags() {
+    return axios.get(this.tag_endpoint, {});
+  }
+
   fetchTags() {
-    return axios.get(this.endpoint, {
+    return axios.get(this.book_endpoint, {
       params: {
         source: JSON.stringify(this.queryForFetchingTags()),
         source_content_type: 'application/json'
@@ -21,7 +27,7 @@ export default class ElasticSearchService {
 
   searchBooks(title, select_with, select_without) {
     const query = this.queryForSearchingBooks(title, select_with, select_without);
-    return axios.post(this.endpoint, query);
+    return axios.post(this.book_endpoint, query);
   }
   
   queryForFetchingTags() {
