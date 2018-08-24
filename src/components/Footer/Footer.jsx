@@ -6,22 +6,6 @@ class Footer extends Component {
     return (
       <footer className="footer">
         <Grid fluid>
-          <nav className="pull-left">
-            <ul>
-              <li>
-                <a href="#pablo">Home</a>
-              </li>
-              <li>
-                <a href="#pablo">Company</a>
-              </li>
-              <li>
-                <a href="#pablo">Portfolio</a>
-              </li>
-              <li>
-                <a href="#pablo">Blog</a>
-              </li>
-            </ul>
-          </nav>
           <p className="copyright pull-right">
             Made by José Reyna (<a href="#">@jobliz</a>) using &nbsp;
             <a href="#">Light-Bootstrap-Dashboard-React</a>
