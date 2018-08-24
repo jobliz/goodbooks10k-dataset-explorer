@@ -7,6 +7,7 @@ import Maps from "views/Maps/Maps";
 import Notifications from "views/Notifications/Notifications";
 import Upgrade from "views/Upgrade/Upgrade";
 
+import DatasetDashboard from "views/DatasetDashboard/DatasetDashboard";
 import TagSearch from "views/TagSearch/TagSearch";
 
 const dashboardRoutes = [
@@ -14,7 +15,7 @@ const dashboardRoutes = [
     path: "/dashboard", // "/dashboard",
     name: "Dashboard",
     icon: "pe-7s-graph",
-    component: Dashboard
+    component: DatasetDashboard
   },
   {
     path: "/search",

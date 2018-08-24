@@ -1,5 +1,4 @@
 import axios from 'axios';
-import TagSearch from '../views/TagSearch/TagSearch';
 
 export default class ElasticSearchService {
 
