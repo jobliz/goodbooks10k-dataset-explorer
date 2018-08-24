@@ -72,6 +72,7 @@ class Dashboard extends Component {
       default:
         break;
     }
+    return;
     _notificationSystem.addNotification({
       title: <span data-notify="icon" className="pe-7s-gift" />,
       message: (
