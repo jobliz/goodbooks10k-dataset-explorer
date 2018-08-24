@@ -9,6 +9,8 @@ import Upgrade from "views/Upgrade/Upgrade";
 
 import DatasetDashboard from "views/DatasetDashboard/DatasetDashboard";
 import TagSearch from "views/TagSearch/TagSearch";
+import About from "views/About/About";
+
 
 const dashboardRoutes = [
   {
@@ -22,6 +24,12 @@ const dashboardRoutes = [
     name: "Book search",
     icon: "pe-7s-search",
     component: TagSearch
+  },
+  {
+    path: "/about",
+    name: "About",
+    icon: "pe-7s-info",
+    component: About
   },
   /*
   {
