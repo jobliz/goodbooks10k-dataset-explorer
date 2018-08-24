@@ -4,6 +4,7 @@ import TagSearch from '../views/TagSearch/TagSearch';
 export default class ElasticSearchService {
 
   constructor(host) {
+    this.host = host;
     this.tag_endpoint = host + '/goodbooks10k-tags/tags/_search';
     this.book_endpoint = host + '/goodbooks10k/books/_search';
     this.fetchTags.bind(this);
@@ -16,10 +17,10 @@ export default class ElasticSearchService {
     return axios.get(this.tag_endpoint, {});
   }
 
-  fetchTags() {
+  fetchTags(size) {
     return axios.get(this.book_endpoint, {
       params: {
-        source: JSON.stringify(this.queryForFetchingTags()),
+        source: JSON.stringify(this.queryForFetchingTags(size)),
         source_content_type: 'application/json'
       }
     });
@@ -29,14 +30,19 @@ export default class ElasticSearchService {
     const query = this.queryForSearchingBooks(title, select_with, select_without);
     return axios.post(this.book_endpoint, query);
   }
-  
-  queryForFetchingTags() {
+
+  countBooks() {
+    const endpoint = this.host + "/goodbooks10k/books/_count"
+    return axios.get(endpoint, {});
+  }
+
+  queryForFetchingTags(size) {
     return {
       "aggs": {
         "byTag": {
           "terms": {
             "field": "tag_nested.name.keyword",
-            "size": 40000
+            "size": size
           }
         }
       },

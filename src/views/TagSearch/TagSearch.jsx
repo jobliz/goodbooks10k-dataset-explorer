@@ -44,7 +44,7 @@ export default class TagSearch extends Component {
   loadTagsFromAggregation() {
     const check = /^([A-Za-z0-9_-]+)$/;
 
-    this.ess.fetchTags().then((res) => {
+    this.ess.fetchTags(40000).then((res) => {
       var new_tags = [];
 
       res.data.aggregations.byTag.buckets.map((bucket) => {
