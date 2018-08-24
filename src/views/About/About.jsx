@@ -25,7 +25,7 @@ class About extends Component {
                     <p>
                       <ul>
                         <li>
-                          <a href="https://github.com/jobliz/goodbooks10k-dataset-explorer/issues">
+                          <a href="https://github.com/jobliz/goodbooks10k-dataset-explorer">
                             Github Repository
                           </a>
                         </li>

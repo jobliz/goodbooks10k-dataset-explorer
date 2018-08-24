@@ -65,4 +65,4 @@ also show the following warning message.
 #! Deprecation: This aggregation creates too many buckets (10001) and will throw an error in future versions. You should update the [search.max_buckets] cluster setting or use the [composite] aggregation to paginate all buckets in multiple requests.
 ```
 
-If you are getting this message, try changing the `search.max_buckets` as indicated. If it still doesn't work or other error comes up, please open an issue.
+If you are getting this message, try changing `search.max_buckets` as indicated. If it still doesn't work or other error comes up, please open an issue.
