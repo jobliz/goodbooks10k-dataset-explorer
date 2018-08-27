@@ -1,10 +1,34 @@
 import React, { Component } from "react";
 import { Grid, Row, Col, FormControl, Button } from "react-bootstrap";
 import Select from 'react-virtualized-select';
-import createFilterOptions from "react-select-fast-filter-options";
 import Card from "components/Card/Card";
+import createFilterOptions from "react-select-fast-filter-options";
 
 import ElasticSearchService from "./../../services/ElasticSearchService";
+import WebWorker from "./../../workers/WebWorker";
+import BuildSearchIndex from "./../../workers/BuildSearchIndex";
+
+const jss = require('js-search');
+
+function createFilterOptionsAlternative(search) {
+  // See https://github.com/JedWatson/react-select/blob/e19bce383a8fd1694278de47b6d00a608ea99f2d/src/Select.js#L830
+  // See https://github.com/JedWatson/react-select#advanced-filters
+  return function filterOptions(options, filter, selectedOptions) {
+    var filtered = filter ? search.search(filter) : options;
+
+    if (Array.isArray(selectedOptions) && selectedOptions.length) {
+      var selectedValues = selectedOptions.map(function (option) {
+        return option[search.valueKey];
+      });
+
+      return filtered.filter(function (option) {
+        return !selectedValues.includes(option[search.valueKey]);
+      });
+    }
+
+    return filtered;
+  };
+}
 
 function split_select_items(string) {
   if(string === "") {
@@ -26,7 +50,8 @@ export default class TagSearch extends Component {
       title_search: '',
       select_with: "",
       select_without: "",
-      results: []
+      results: [],
+      worker_output: null,
     };
 
     this.ess = new ElasticSearchService('http://localhost:9200');
@@ -38,7 +63,24 @@ export default class TagSearch extends Component {
   }
 
   componentDidMount() {
-    this.loadTagsFromAggregation(); 
+    this.loadTagsFromAggregation();  
+    this.worker = new WebWorker(BuildSearchIndex);
+    this.worker.addEventListener('message', event => {
+      console.log("Received searchIndex data from worker");
+      this.setState({'worker_output': event.data}, () => {
+        var _search = new jss.Search('value');
+        _search.searchIndex = new jss.UnorderedSearchIndex();
+        _search.indexStrategy = new jss.AllSubstringsIndexStrategy();
+        _search.addIndex('label');
+        _search.valueKey = 'value';
+        _search.labelKey = 'label';
+        console.log("Monkey-patching searchIndex");
+        _search._searchIndex._tokenToUidToDocumentMap = event.data;
+
+        const filter_options = createFilterOptionsAlternative(_search);
+        this.setState({'filterOptions': filter_options}, () => {});
+      });
+    });
   }
 
   loadTagsFromAggregation() {
@@ -61,11 +103,8 @@ export default class TagSearch extends Component {
       });
 
       this.setState({'tags': new_tags}, () => {
-        const filter_options = createFilterOptions({
-          labelKey: 'label',
-          options: this.state.tags
-        });
-        this.setState({'filterOptions': filter_options}, () => {});
+        console.log("posting tag data to worker");
+        this.worker.postMessage(new_tags);
       });
     })
   }
@@ -118,7 +157,9 @@ export default class TagSearch extends Component {
     // -----------------
     var tag_search_fields;
 
-    if(this.state.tags.length !== 0 && this.state.filterOptions !== null) {
+    if(  this.state.worker_output !== null
+      && this.state.tags.length !== 0 
+      && this.state.filterOptions !== null) {
       tag_search_fields = <div>
         <strong>With tags:</strong>
           <Select
