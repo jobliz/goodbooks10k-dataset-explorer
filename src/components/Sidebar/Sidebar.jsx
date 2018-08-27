@@ -47,10 +47,10 @@ class Sidebar extends Component {
             </div>
           </a>
           <a
-            href="https://www.creative-tim.com"
+            href="https://github.com/jobliz/goodbooks10k-dataset-explorer"
             className="simple-text logo-normal"
           >
-            Goodreads10k
+            gb10k-explorer
           </a>
         </div>
         <div className="sidebar-wrapper">

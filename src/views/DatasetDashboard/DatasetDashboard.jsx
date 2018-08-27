@@ -98,7 +98,11 @@ class Dashboard extends Component {
                 statsText="Books"
                 statsValue="10000"
                 statsIcon={<i className="fa fa-info" />}
-                statsIconText={<div>Pre-selected in the <a href='#'>dataset repository.</a></div>}
+                statsIconText={
+                  <div>From the &nbsp;
+                    <a href='https://github.com/zygmuntz/goodbooks-10k'> 
+                      goodbooks-10k dataset repository</a>.
+                  </div>}
               />
             </Col>
             <Col lg={6} sm={12}>
@@ -107,7 +111,7 @@ class Dashboard extends Component {
                 statsText="Tags"
                 statsValue="34098"
                 statsIcon={<i className="fa fa-info" />}
-                statsIconText="Lots of them, all searchable!"
+                statsIconText="Lots of them!"
               />
             </Col>
           </Row>

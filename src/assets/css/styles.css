@@ -2,8 +2,9 @@
     float: right;
 }
 
-.search-result-listing-outer h4 {
+.search-result-listing-outer h3 {
     margin-top: 0;
+    margin-bottom: 24px;
 }
 
 .search-result-listing span {
@@ -11,11 +12,28 @@
     font-family: Mono;
     font-size: 12px;
 }
-
-.search-result-listing .result-item {
-    margin-bottom: 2em;
+.search-result-listing .result-item .well {
+    margin-bottom: 0;
 }
 
 .search-result-listing .present {
     font-weight: bold;
+}
+
+.search-form-item-wrapper {
+    margin-bottom: 8px;
+}
+
+.search-form-item-wrapper .is-searchable,
+.search-form-item-wrapper .form-control {
+    margin-top: 4px;
+}
+
+p.building-index {
+    margin-top: 5px;
+    margin-bottom: 0;
+}
+
+p.building-index i {
+    margin-right: 8px;
 }

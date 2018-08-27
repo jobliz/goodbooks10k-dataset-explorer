@@ -8,6 +8,8 @@ import ElasticSearchService from "./../../services/ElasticSearchService";
 import WebWorker from "./../../workers/WebWorker";
 import BuildSearchIndex from "./../../workers/BuildSearchIndex";
 
+import SearchResultItem from './SearchResultItem';
+
 const jss = require('js-search');
 
 const STORAGE_TAG_DATA_KEY = "storage_tag_data";
@@ -219,37 +221,45 @@ export default class TagSearch extends Component {
     if(  this.state.tags !== null 
       && this.state.filterOptions !== null) {
       tag_search_fields = <div>
-        <strong>With tags:</strong>
-          <Select
-            autofocus
-            simpleValue
-            multi={true}
-            searchable={true}
-            clearable={true}
-            disabled={false}
-            onChange={this.handleTagWithSelect}
-            options={this.state.tags}
-            value={this.state.select_with}
-            filterOptions={this.state.filterOptions}
-          />
+        <div class="search-form-item-wrapper">
+          <strong>With tags:</strong>
+            <Select
+              autofocus
+              simpleValue
+              multi={true}
+              searchable={true}
+              clearable={true}
+              disabled={false}
+              onChange={this.handleTagWithSelect}
+              options={this.state.tags}
+              value={this.state.select_with}
+              filterOptions={this.state.filterOptions}
+            />
+          </div>
 
-          <strong>Without tags:</strong>
-          <Select
-            autofocus
-            simpleValue
-            multi={true}
-            searchable={true}
-            clearable={true}
-            disabled={false}
-            onChange={this.handleTagWithoutSelect}
-            options={this.state.tags}
-            value={this.state.select_without}
-            filterOptions={this.state.filterOptions}
-          />
+          <div class="search-form-item-wrapper">
+            <strong>Without tags:</strong>
+            <Select
+              autofocus
+              simpleValue
+              multi={true}
+              searchable={true}
+              clearable={true}search-form-item-wrapper
+              disabled={false}
+              onChange={this.handleTagWithoutSelect}
+              options={this.state.tags}
+              value={this.state.select_without}
+              filterOptions={this.state.filterOptions}
+            />
+          </div>
       </div>
     } else {
       tag_search_fields = <div>
-        <p>The tag search index is being built in your browser, please wait...</p>
+        <p className="building-index">
+          <i className="icon-spinner icon-spin icon-large"></i>
+          The tag filtering index is being built. 
+          The tag selectors need it, please wait a moment...
+        </p>
       </div>
     }
 
@@ -261,24 +271,40 @@ export default class TagSearch extends Component {
 
     this.state.results.map((result) => {
       var tag_list = []
-
       result.tag_list.map((tag) => {
+        var random_key = Math.random().toString(36).substring(2);
         if(with_tags.includes(tag)) {
-          tag_list.push(<span className="present">{tag}</span>);
+          tag_list.push(<span key={random_key} className="present">{tag}</span>);
         } else {
-          tag_list.push(<span>{tag}</span>);
+          tag_list.push(<span key={random_key}>{tag}</span>);
         }
       })
 
       result_list.push(
-        <div key={result.id} className="result-item">
-          <p>
-            <h5>{result.title}</h5>
-            {tag_list}
-          </p>
-        </div>
+        <SearchResultItem
+          key={result.id}
+          title={result.title}
+          tag_list={tag_list} 
+        ></SearchResultItem>
       );
     });
+
+    var result_area;
+
+    if(this.state.results.length === 0) {
+      result_area = 
+      <div>
+        Results will appear here after searching.
+      </div>
+    } else {
+      result_area = 
+      <div className="search-result-listing-outer">
+        <h3>Results: ({ this.state.results.length }) </h3>
+        <div className="search-result-listing">
+          {result_list}
+        </div>
+      </div>;
+    }
 
     return (
       <div className="content">
@@ -296,27 +322,22 @@ export default class TagSearch extends Component {
               content={
                 <Row>
                   <Col md={12}>
-                    <strong>In Title:</strong>
-                    <FormControl
-                      type="text"
-                      value={this.state.title_search}
-                      placeholder="Enter text"
-                      onChange={this.handleTitleSearchInput}
-                    />
+                    <div className="search-form-item-wrapper">
+                      <strong>In Title:</strong>
+                      <FormControl
+                        type="text"
+                        value={this.state.title_search}
+                        placeholder="Enter text"
+                        onChange={this.handleTitleSearchInput}
+                      />
+                    </div>
                     {tag_search_fields}
                   </Col>
                 </Row>
               }> {/* card.content end */}
               </Card>
 
-              <Card content={
-                <div className="search-result-listing-outer">
-                  <h4>Results:</h4>
-                  <div className="search-result-listing">
-                    {result_list}
-                  </div>
-                </div>}>
-              </Card>
+              <Card content={result_area}></Card>
             </Col>
           </Row>
         </Grid>

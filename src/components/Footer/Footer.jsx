@@ -7,8 +7,9 @@ class Footer extends Component {
       <footer className="footer">
         <Grid fluid>
           <p className="copyright pull-right">
-            Made by José Reyna (<a href="#">@jobliz</a>) using &nbsp;
-            <a href="#">Light-Bootstrap-Dashboard-React</a>
+            Made by José Reyna (<a href="https://twitter.com/jobliz">@jobliz</a>) using &nbsp;
+            <a href="#">Light-Bootstrap-Dashboard-React</a>. &nbsp;
+            Sidebar background: JF Rauzier, Bibliotheque Babel, 2013
           </p>
         </Grid>
       </footer>
