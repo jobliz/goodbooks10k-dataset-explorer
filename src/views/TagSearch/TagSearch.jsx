@@ -10,6 +10,9 @@ import BuildSearchIndex from "./../../workers/BuildSearchIndex";
 
 const jss = require('js-search');
 
+const STORAGE_TAG_DATA_KEY = "storage_tag_data";
+const STORAGE_INDEX_DATA_KEY = "storage_index_data";
+
 function createFilterOptionsAlternative(search) {
   // See https://github.com/JedWatson/react-select/blob/e19bce383a8fd1694278de47b6d00a608ea99f2d/src/Select.js#L830
   // See https://github.com/JedWatson/react-select#advanced-filters
@@ -45,7 +48,8 @@ export default class TagSearch extends Component {
     this.props = props;
 
     this.state = {
-      tags: [],
+      tags: this.retrieveTagOptionsFromStorage(),
+      index_core_data: this.retrieveIndexDataFromStorage(),
       filterOptions: null,
       title_search: '',
       select_with: "",
@@ -60,35 +64,87 @@ export default class TagSearch extends Component {
     this.handleTitleSearchInput = this.handleTitleSearchInput.bind(this);
     this.handleTagWithSelect = this.handleTagWithSelect.bind(this);
     this.handleTagWithoutSelect = this.handleTagWithoutSelect.bind(this);
-  }
 
-  componentDidMount() {
-    this.loadTagsFromAggregation();  
     this.worker = new WebWorker(BuildSearchIndex);
     this.worker.addEventListener('message', event => {
       console.log("Received searchIndex data from worker");
-      this.setState({'worker_output': event.data}, () => {
-        var _search = new jss.Search('value');
-        _search.searchIndex = new jss.UnorderedSearchIndex();
-        _search.indexStrategy = new jss.AllSubstringsIndexStrategy();
-        _search.addIndex('label');
-        _search.valueKey = 'value';
-        _search.labelKey = 'label';
-        console.log("Monkey-patching searchIndex");
-        _search._searchIndex._tokenToUidToDocumentMap = event.data;
-
-        const filter_options = createFilterOptionsAlternative(_search);
-        this.setState({'filterOptions': filter_options}, () => {});
+      this.setState({'index_core_data': event.data}, () => {
+        // TODO: see if the JSON.stringify allocation error can be solved 
+        // this.enterIndexDataToStorage(event.data);
+        if(this.state.tags !== null) {
+          this.buildTagSelectorEnvironment(
+            this.state.tags,
+            this.state.index_core_data
+          );
+        } else {
+          alert("Unexpected error: Index data found, but no tag data");
+        }
       });
     });
   }
 
-  loadTagsFromAggregation() {
+  retrieveTagOptionsFromStorage() {
+    var data = localStorage.getItem(STORAGE_TAG_DATA_KEY);
+    
+    if(data ===  null) {
+      return data;
+    } else {
+      return JSON.parse(data);
+    }
+  }
+
+  retrieveIndexDataFromStorage() {
+    var data = localStorage.getItem(STORAGE_INDEX_DATA_KEY);
+
+    if(data === null) {
+      return data;
+    } else {
+      return JSON.parse(data);
+    }
+  }
+
+  enterTagOptionsIntoStorage(tag_options) {
+    localStorage.setItem(STORAGE_TAG_DATA_KEY, JSON.stringify(tag_options));
+  }
+
+  enterIndexDataToStorage(index_data) {
+    localStorage.setItem(STORAGE_INDEX_DATA_KEY, JSON.stringify(index_data));
+  }
+
+  componentDidMount() {
+    if(this.state.tags === null || this.state.index_core_data === null) {
+      this.beginDataLoadingProcess();
+    } else {
+      this.buildTagSelectorEnvironment(
+        this.state.tags,
+        this.state.index_core_data
+      );
+    }
+  }
+
+  buildTagSelectorEnvironment(tag_options, raw_index_data) {
+    var _search = new jss.Search('value');
+    _search.searchIndex = new jss.UnorderedSearchIndex();
+    _search.indexStrategy = new jss.AllSubstringsIndexStrategy();
+    _search.addIndex('label');
+    _search.valueKey = 'value';
+    _search.labelKey = 'label';
+
+    console.log("Monkey-patching searchIndex");
+    _search._searchIndex._tokenToUidToDocumentMap = raw_index_data;
+
+    this.setState({
+      'tags': tag_options,
+      'filterOptions': createFilterOptionsAlternative(_search)
+    });
+  }
+
+  beginDataLoadingProcess() {
+    console.log("beginDataLoadingProcess()");
     const check = /^([A-Za-z0-9_-]+)$/;
+    var new_tags = [];
 
     this.ess.fetchTags(40000).then((res) => {
-      var new_tags = [];
-
       res.data.aggregations.byTag.buckets.map((bucket) => {
         // tag 2385 in aggregation is "", which breaks the select. evade it
         if(bucket.key !== "") {
@@ -103,10 +159,13 @@ export default class TagSearch extends Component {
       });
 
       this.setState({'tags': new_tags}, () => {
-        console.log("posting tag data to worker");
-        this.worker.postMessage(new_tags);
+        this.enterTagOptionsIntoStorage(new_tags);
+        
+        if(this.state.index_core_data === null) {
+          this.worker.postMessage(new_tags);
+        }
       });
-    })
+    });
   }
 
   handleSearchButton = (event) => {
@@ -157,8 +216,7 @@ export default class TagSearch extends Component {
     // -----------------
     var tag_search_fields;
 
-    if(  this.state.worker_output !== null
-      && this.state.tags.length !== 0 
+    if(  this.state.tags !== null 
       && this.state.filterOptions !== null) {
       tag_search_fields = <div>
         <strong>With tags:</strong>
@@ -191,7 +249,7 @@ export default class TagSearch extends Component {
       </div>
     } else {
       tag_search_fields = <div>
-        <p>Tags are being loaded, please wait...</p>  
+        <p>The tag search index is being built in your browser, please wait...</p>
       </div>
     }
 
