@@ -85,6 +85,21 @@ export default class TagSearch extends Component {
     });
   }
 
+  componentDidMount() {
+    if(this.state.tags === null || this.state.index_core_data === null) {
+      this.beginDataLoadingProcess();
+    } else {
+      this.buildTagSelectorEnvironment(
+        this.state.tags,
+        this.state.index_core_data
+      );
+    }
+  }
+
+  componentWillUnmount() {
+    this.worker.terminate();
+  }
+
   retrieveTagOptionsFromStorage() {
     var data = localStorage.getItem(STORAGE_TAG_DATA_KEY);
     
@@ -111,17 +126,6 @@ export default class TagSearch extends Component {
 
   enterIndexDataToStorage(index_data) {
     localStorage.setItem(STORAGE_INDEX_DATA_KEY, JSON.stringify(index_data));
-  }
-
-  componentDidMount() {
-    if(this.state.tags === null || this.state.index_core_data === null) {
-      this.beginDataLoadingProcess();
-    } else {
-      this.buildTagSelectorEnvironment(
-        this.state.tags,
-        this.state.index_core_data
-      );
-    }
   }
 
   buildTagSelectorEnvironment(tag_options, raw_index_data) {
