@@ -19,7 +19,9 @@ class Dashboard extends Component {
   constructor(props) {
     super(props);
     this.props = props;
-    this.ess = new ElasticSearchService('http://localhost:9200');
+
+    // set environment variable to 'http://localhost:9200' for testing purposes
+    this.ess = new ElasticSearchService(process.env.ES_PROXY);
 
     this.state = {
       tags_are_loaded: false,
