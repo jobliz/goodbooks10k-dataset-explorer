@@ -1,3 +1,4 @@
+import re
 import os
 import sys
 import csv
@@ -10,14 +11,18 @@ from elasticsearch_dsl import Index
 
 import certifi
 
-# Set to 'localhost' for development purposes
-connections.create_connection(
-    hosts=[os.environ['ES_HOST']], 
-    http_auth=(os.environ['ES_USER'], os.environ['ES_PASS']),
-    ca_certs=certifi.where(), 
-    timeout=20)
+# https://docs.bonsai.io/docs/python
+bonsai = os.environ['ES_HOST']
+auth = re.search('https\:\/\/(.*)\@', bonsai).group(1).split(':')
+host = bonsai.replace('https://%s:%s@' % (auth[0], auth[1]), '')
+es_header = [{
+  'host': host,
+  'port': 443,
+  'use_ssl': True,
+  'http_auth': (auth[0],auth[1])
+}]
 
-es = Elasticsearch()
+es = Elasticsearch(es_header)
 ess = Search(using=es)
 
 ES_MEDIA_INDEX = 'goodbooks10k'
