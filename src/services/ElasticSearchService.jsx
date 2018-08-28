@@ -27,7 +27,12 @@ export default class ElasticSearchService {
 
   searchBooks(title, select_with, select_without) {
     const query = this.queryForSearchingBooks(title, select_with, select_without);
-    return axios.post(this.book_endpoint, query);
+    return axios.get(this.book_endpoint, {
+      params: {
+        source: JSON.stringify(query),
+        source_content_type: 'application/json'
+      }
+    });
   }
 
   countBooks() {
