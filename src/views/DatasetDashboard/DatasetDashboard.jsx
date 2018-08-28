@@ -55,8 +55,6 @@ class Dashboard extends Component {
           series: [new_series]
         },
         tags_are_loaded: true
-      }, () => {
-        console.log(this.state);
       });
     })
   }
