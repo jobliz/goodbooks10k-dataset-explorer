@@ -59,8 +59,9 @@ export default class TagSearch extends Component {
       results: [],
       worker_output: null,
     };
-
-    this.ess = new ElasticSearchService('http://localhost:9200');
+    
+    // set environment variable to 'http://localhost:9200' for testing purposes
+    this.ess = new ElasticSearchService(process.env.ES_PROXY);
 
     this.handleSearchButton = this.handleSearchButton.bind(this);
     this.handleTitleSearchInput = this.handleTitleSearchInput.bind(this);

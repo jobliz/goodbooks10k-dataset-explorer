@@ -1,3 +1,4 @@
+import os
 import sys
 import csv
 
@@ -7,7 +8,8 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import DocType, Nested, Keyword, Integer
 from elasticsearch_dsl import Index
 
-connections.create_connection(hosts=['localhost'], timeout=20)
+# Set to 'localhost' for development purposes
+connections.create_connection(hosts=[os.environ['ES_HOST']], timeout=20)
 es = Elasticsearch()
 ess = Search(using=es)
 
@@ -74,3 +76,4 @@ with open('new_nested_tags.csv', newline='') as csvfile:
         bulk_data.append(data_dict)
 
 es.bulk(index=ES_MEDIA_INDEX, body=bulk_data, refresh=True, request_timeout=10000)
+print("Finished bulk loading!")

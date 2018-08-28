@@ -1,12 +1,15 @@
 const express = require('express');
 const app = express();
 
-// Run the app by serving the static files
-// in the dist directory
+function redirectUnmatched(req, res) {
+  if (req.method == "GET") {
+    res.redirect(process.env.ES_HOST);
+  } else {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify({ error: 'ONLY_GET_REQUESTS_ALLOWED' }));
+  }
+}
 
 app.use(express.static(__dirname + '/build'));
-
-// Start the app by listening on the default
-// Heroku port
-
+app.use(redirectUnmatched);
 app.listen(process.env.PORT || 8080);
