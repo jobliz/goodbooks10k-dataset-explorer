@@ -181,6 +181,11 @@ export default class TagSearch extends Component {
       this.state.select_without)
         .then((response) => {
           var new_results = [];
+
+          if(response.data.hits.hits.length === 0) {
+            alert("No results found.");
+          }
+
           response.data.hits.hits.map((hit) => {
             new_results.push(hit._source);
           });
