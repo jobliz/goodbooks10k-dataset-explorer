@@ -6,6 +6,7 @@
     "axios": "^0.18.0",
     "bootstrap": "3.3.7",
     "chartist": "0.10.1",
+    "express": "^4.16.3",
     "node-sass": "4.6.1",
     "node-sass-chokidar": "0.0.3",
     "npm-run-all": "4.1.2",
@@ -25,9 +26,15 @@
     "build-css": "node-sass-chokidar --include-path ./src --include-path ./node_modules src/ -o src/",
     "watch-css": "npm run build-css && node-sass-chokidar --include-path ./src --include-path ./node_modules src/ -o src/ --watch --recursive",
     "start-js": "react-scripts start",
-    "start": "npm-run-all -p watch-css start-js",
+    "start-dev": "npm-run-all -p watch-css start-js",
     "build": "npm run build-css && react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "postinstall": "npm run build && npm start",
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": "8.11.3",
+    "npm": "5.6.0"
   }
 }
