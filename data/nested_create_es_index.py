@@ -8,8 +8,10 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import DocType, Nested, Keyword, Integer
 from elasticsearch_dsl import Index
 
+import certifi
+
 # Set to 'localhost' for development purposes
-connections.create_connection(hosts=[os.environ['ES_HOST']], timeout=20)
+connections.create_connection(hosts=[os.environ['ES_HOST']], ca_certs=certifi.where(), timeout=20)
 es = Elasticsearch()
 ess = Search(using=es)
 
