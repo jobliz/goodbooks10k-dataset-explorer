@@ -11,18 +11,21 @@ from elasticsearch_dsl import Index
 
 import certifi
 
-# https://docs.bonsai.io/docs/python
-bonsai = os.environ['ES_HOST']
-auth = re.search('https\:\/\/(.*)\@', bonsai).group(1).split(':')
-host = bonsai.replace('https://%s:%s@' % (auth[0], auth[1]), '')
-es_header = [{
-  'host': host,
-  'port': 443,
-  'use_ssl': True,
-  'http_auth': (auth[0],auth[1])
-}]
+if os.environ['NODE_ENV'] == 'production':
+    # https://docs.bonsai.io/docs/python
+    bonsai = os.environ['ES_HOST']
+    auth = re.search('https\:\/\/(.*)\@', bonsai).group(1).split(':')
+    host = bonsai.replace('https://%s:%s@' % (auth[0], auth[1]), '')
+    es_header = [{
+        'host': host,
+        'port': 443,
+        'use_ssl': True,
+        'http_auth': (auth[0],auth[1])
+    }]
+    es = Elasticsearch(es_header)
+else:
+    es = Elasticsearch()
 
-es = Elasticsearch(es_header)
 ess = Search(using=es)
 
 ES_MEDIA_INDEX = 'goodbooks10k'
@@ -53,7 +56,7 @@ es.indices.put_mapping(
     }
 )
 
-with open('new_nested_tags.csv', newline='') as csvfile:
+with open('./data/new_nested_tags.csv', newline='') as csvfile:
     reader = csv.reader(csvfile, delimiter=',')
     for item in reader:
         tag_id_name_pairs = item[2].split("|")
