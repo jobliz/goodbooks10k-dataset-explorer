@@ -11,6 +11,9 @@ from elasticsearch_dsl import Index
 
 import certifi
 
+if os.environ['UPDATE_ES_INDEX'] == 'NO':
+    sys.exit()
+
 if os.environ['NODE_ENV'] == 'production':
     # https://docs.bonsai.io/docs/python
     bonsai = os.environ['ES_HOST']
