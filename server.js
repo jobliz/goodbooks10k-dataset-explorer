@@ -163,7 +163,7 @@ function redirectUnmatchedGetToElasticsearch(req, res) {
     // console.log(req.params);
     // console.log(req.query);
 
-    if(typeof(req.body) === "object") {
+    if(typeof(req.body) === "object" && req.body.params !== undefined) {
       var promise = axios.get(url, {
         params: {
           source: JSON.stringify(req.body),
