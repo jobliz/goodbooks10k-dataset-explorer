@@ -6,18 +6,36 @@ export default class ElasticSearchService {
     this.host = host;
     this.tag_endpoint = host + '/goodbooks10k-tags/tags/_search';
     this.book_endpoint = host + '/goodbooks10k/books/_search';
+
+    // need to receive http as adapter for axios to work in jest tests
+    // https://stackoverflow.com/q/42677387/9930918
+    this.axios_adapter = null;
+
+    this.get.bind(this);
     this.fetchTags.bind(this);
     this.searchBooks.bind(this);
     this.queryForFetchingTags.bind(this);
     this.queryForSearchingBooks.bind(this);
   }
 
+  setAxiosAdapter(adapter) {
+    this.axios_adapter = adapter;
+  }
+
+  get(url, params) {
+    if(this.axios_adapter !== null) {
+      params['adapter'] = this.axios_adapter;
+    }
+
+    return axios.get(url, params);
+  }
+
   listTags() {
-    return axios.get(this.tag_endpoint, {});
+    return this.get(this.tag_endpoint, {});
   }
 
   fetchTags(size) {
-    return axios.get(this.book_endpoint, {
+    return this.get(this.book_endpoint, {
       params: {
         source: JSON.stringify(this.queryForFetchingTags(size)),
         source_content_type: 'application/json'
@@ -27,7 +45,7 @@ export default class ElasticSearchService {
 
   searchBooks(title, select_with, select_without) {
     const query = this.queryForSearchingBooks(title, select_with, select_without);
-    return axios.get(this.book_endpoint, {
+    return this.get(this.book_endpoint, {
       params: {
         source: JSON.stringify(query),
         source_content_type: 'application/json'
@@ -37,7 +55,7 @@ export default class ElasticSearchService {
 
   countBooks() {
     const endpoint = this.host + "/goodbooks10k/books/_count"
-    return axios.get(endpoint, {});
+    return this.get(endpoint, {});
   }
 
   queryForFetchingTags(size) {
