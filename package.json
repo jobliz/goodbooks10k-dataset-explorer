@@ -1,6 +1,6 @@
 {
-  "name": "light-bootstrap-dashboard-react",
-  "version": "1.2.0",
+  "name": "goodbooks10k-dataset-explorer",
+  "version": "0.0.0",
   "private": true,
   "dependencies": {
     "autoprefixer": "7.1.6",
