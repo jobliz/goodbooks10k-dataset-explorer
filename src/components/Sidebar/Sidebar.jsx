@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
 
 import HeaderLinks from "../Header/HeaderLinks.jsx";
+import GoodbooksHeaderLinks from '../Header/GoodbooksHeaderLinks.jsx';
 
 import imagine from "assets/img/sidebar-3.jpg";
 import logo from "assets/img/reactlogo.png";
@@ -55,7 +56,7 @@ class Sidebar extends Component {
         </div>
         <div className="sidebar-wrapper">
           <ul className="nav">
-            {this.state.width <= 991 ? <HeaderLinks /> : null}
+            {this.state.width <= 991 ? <GoodbooksHeaderLinks /> : null}
             {dashboardRoutes.map((prop, key) => {
               if (!prop.redirect)
                 return (
