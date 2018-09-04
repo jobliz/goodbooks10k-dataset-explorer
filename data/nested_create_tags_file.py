@@ -45,7 +45,10 @@ with open('new_nested_tags.csv', 'w', newline='') as csvfile:
         'ratings_2',
         'ratings_3',
         'ratings_4',
-        'ratings_5'    
+        'ratings_5',
+        'ratings_count',
+        'image_url',
+        'small_image_url' 
     ]
 
     writer.writerow(column_names)
