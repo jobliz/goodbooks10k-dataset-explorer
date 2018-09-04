@@ -28,10 +28,10 @@ function queryForFetchingTags(size) {
 /**
  * Creates the book search elasticsearch query.
  */
-function queryForSearchingBooks(title, select_with, select_without) {
+function queryForSearchingBooks(size, title, select_with, select_without) {
   var with_list = [];
   var without_list = [];
-  var query = {"from" : 0, "size" : 50, "query":{"bool": {}}};
+  var query = {"from" : 0, "size" : size, "query":{"bool": {}}};
 
   // search by title
   if(title !== '') {
@@ -62,6 +62,28 @@ function queryForSearchingBooks(title, select_with, select_without) {
   }
 
   return query;
+}
+
+/**
+ * Creates a query to do search-as-you-type with book titles.
+ * Prefix is a straing, fuzziness is an integer that goes from
+ * 0 (no fuzziness at all) up, increasing the number of characters
+ * of distance that are allowed from the given prefix.
+ */
+function queryForBookTitleSearchAsYouType(prefix, fuzziness) {
+  return {
+    "suggest": {
+      "book-suggest-fuzzy": {
+        "prefix": prefix,
+        "completion": {
+          "field": "title.completion",
+          "fuzzy": {
+            "fuzziness": fuzziness
+          }
+        }
+      }
+    }
+  }
 }
 
 function getTags(req, res) {
@@ -110,6 +132,8 @@ function searchBooks(req, res) {
   var select_with = req.body.select_with;
   var select_without = req.body.select_without;
 
+  const size = 100;
+
   if(title_search === undefined) { title_search = ""};
   if(select_with === undefined) { select_with = ""};
   if(select_without === undefined) { select_without = ""};
@@ -131,7 +155,8 @@ function searchBooks(req, res) {
 
   const params = {
     params: {
-      source: JSON.stringify(queryForSearchingBooks(title_search, select_with, select_without)),
+      source: JSON.stringify(queryForSearchingBooks(
+        size, title_search, select_with, select_without)),
       source_content_type: 'application/json'
     }
   };
@@ -141,7 +166,7 @@ function searchBooks(req, res) {
     res2.data.hits.hits.map((hit) => {
       results.push(hit._source);
     });
-    res.send({success: true, data: results})
+    res.send(res2.data);
   }).catch((error) => {
     console.log("Error 500 on searchBooks called with payload:");
     console.log(payload);

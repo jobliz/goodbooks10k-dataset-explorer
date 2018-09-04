@@ -43,6 +43,15 @@ export default class ElasticSearchService {
     });
   }
 
+  searchBooksProxied(title, select_with, select_without) {
+    const endpoint = this.host + '/api/v1/search_books'
+    return this.get(endpoint, {
+      title_search: title,
+      select_with: select_with,
+      select_without: select_without
+    });
+  }
+
   searchBooks(title, select_with, select_without) {
     const query = this.queryForSearchingBooks(title, select_with, select_without);
     return this.get(this.book_endpoint, {

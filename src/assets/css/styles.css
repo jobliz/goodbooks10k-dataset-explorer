@@ -7,17 +7,43 @@
     margin-bottom: 24px;
 }
 
-.search-result-listing span {
+.tag-list-well span {
     margin-right: 0.5em;
     font-family: Mono;
     font-size: 12px;
 }
+
+.tag-list-well span.present {
+    font-weight: bold;
+}
+
 .search-result-listing .result-item .well {
     margin-bottom: 0;
 }
 
 .search-result-listing .present {
     font-weight: bold;
+}
+
+.search-result-listing img.book-thumbnail {
+    margin-right: 16px;
+    vertical-align: top;
+    margin-top: 8px;
+}
+
+.search-result-listing .title-author-view {
+    display: inline-block;
+}
+
+.search-result-listing .card-search-result-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.search-result-listing .card-search-result-title-author {
+    font-size: 15px;
+    color: #555555;
+    margin-bottom: 8px;
 }
 
 .search-form-item-wrapper {

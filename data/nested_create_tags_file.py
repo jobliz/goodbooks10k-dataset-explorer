@@ -34,6 +34,7 @@ with open('new_nested_tags.csv', 'w', newline='') as csvfile:
 
     column_names = [
         'work_id',
+        'goodreads_book_id',
         'isbn',
         'isbn13',
         'original_publication_year',

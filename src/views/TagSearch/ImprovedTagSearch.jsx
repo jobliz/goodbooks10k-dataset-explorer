@@ -109,7 +109,7 @@ export default class ImprovedTagSearch extends Component {
   }
 
   handleSearchButton = (event) => {
-    this.ess.searchBooks(
+    this.ess.searchBooksProxied(
       this.state.title_search, 
       this.state.select_with, 
       this.state.select_without)
@@ -225,7 +225,7 @@ export default class ImprovedTagSearch extends Component {
       result_list.push(
         <SearchResultItem
           key={result.id}
-          title={result.title}
+          result={result}
           tag_list={tag_list} 
         ></SearchResultItem>
       );
