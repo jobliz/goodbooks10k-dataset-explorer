@@ -31,6 +31,25 @@ with tqdm(total=len(bt)) as pbar:
 print("Creating new CSV file")
 with open('new_nested_tags.csv', 'w', newline='') as csvfile:
     writer = csv.writer(csvfile, delimiter=',')
+
+    column_names = [
+        'work_id',
+        'isbn',
+        'isbn13',
+        'original_publication_year',
+        'title',
+        'original_title', 
+        'authors',
+        'tags',
+        'ratings_1',
+        'ratings_2',
+        'ratings_3',
+        'ratings_4',
+        'ratings_5'    
+    ]
+
+    writer.writerow(column_names)
+
     with tqdm(total=len(b)) as pbar:
         for index, row in b.iterrows():
             book_tag_id_list = book_tags[row['goodreads_book_id']]
@@ -41,7 +60,8 @@ with open('new_nested_tags.csv', 'w', newline='') as csvfile:
             
             tag_string_pair = ['_'.join([str(key), value]) for key, value in book_tag_hash.items()]
             tag_string = '|'.join(tag_string_pair)
-            writer.writerow([row['goodreads_book_id'], row['title'], tag_string])
-            
+            row['tags'] = tag_string
+            item = [row[name] for name in column_names]
+            writer.writerow(item)
             pbar.update(1)
 

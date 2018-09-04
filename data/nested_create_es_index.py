@@ -11,7 +11,7 @@ from elasticsearch_dsl import Index
 
 import certifi
 
-if os.environ['UPDATE_ES_INDEX'] == 'NO':
+if os.environ['UPDATE_ES_INDEX'] != 'YES':
     sys.exit()
 
 if os.environ['NODE_ENV'] == 'production':
@@ -45,7 +45,43 @@ if es.indices.exists(ES_MEDIA_INDEX):
 es.indices.create(index=ES_MEDIA_INDEX, body={
     "settings": {
         "number_of_shards": 1,
-        "number_of_replicas": 0
+        "number_of_replicas": 0,
+        "index": {
+            "analysis": {
+                "filter": {},
+                "analyzer": {
+                    "keyword_analyzer": {
+                        "filter": [
+                            "lowercase",
+                            "asciifolding",
+                            "trim"
+                        ],
+                        "char_filter": [],
+                        "type": "custom",
+                        "tokenizer": "keyword"
+                    },
+                    "edge_ngram_analyzer": {
+                        "filter": [
+                            "lowercase"
+                        ],
+                        "tokenizer": "edge_ngram_tokenizer"
+                    },
+                    "edge_ngram_search_analyzer": {
+                        "tokenizer": "lowercase"
+                    }
+                },
+                "tokenizer": {
+                    "edge_ngram_tokenizer": {
+                        "type": "edge_ngram",
+                        "min_gram": 2,
+                        "max_gram": 5,
+                        "token_chars": [
+                            "letter"
+                        ]
+                    }
+                }
+            }
+        }
     }
 })
 
@@ -54,15 +90,32 @@ es.indices.put_mapping(
     doc_type=ES_MEDIA_TYPE,
     body={
         "properties": {  
-            "title": {"type": "text"}
+            "title": {
+                "type": "text",
+                "fields": {
+                    "keywordstring": {
+                        "type": "text",
+                        "analyzer": "keyword_analyzer"
+                    },
+                    "edgengram": {
+                        "type": "text",
+                        "analyzer": "edge_ngram_analyzer",
+                        "search_analyzer": "edge_ngram_search_analyzer"
+                    },
+                    "completion": {
+                        "type": "completion"
+                    }
+                },
+                "analyzer": "standard"
+            }
         }
     }
 )
 
 with open('./data/new_nested_tags.csv', newline='') as csvfile:
-    reader = csv.reader(csvfile, delimiter=',')
+    reader = csv.DictReader(csvfile, delimiter=',')
     for item in reader:
-        tag_id_name_pairs = item[2].split("|")
+        tag_id_name_pairs = item['tags'].split("|")
         splitted = [pair.split('_') for pair in tag_id_name_pairs]
         
         tag_list = []
@@ -76,8 +129,19 @@ with open('./data/new_nested_tags.csv', newline='') as csvfile:
             })
 
         data_dict = {
-            'id': item[0],
-            'title': item[1],
+            'id': item['work_id'],
+            'work_id': item['work_id'],
+            'isbn': item['isbn'],
+            'isbn13': item['isbn13'],
+            'original_publication_year': item['original_publication_year'],
+            'title': item['title'],
+            'original_title': item['original_title'],
+            'authors': item['authors'],
+            'ratings_1': item['ratings_1'],
+            'ratings_2': item['ratings_2'],
+            'ratings_3': item['ratings_3'],
+            'ratings_4': item['ratings_4'],
+            'ratings_5': item['ratings_5'],
             'tag_list': tag_list,
             'tag_nested': tag_nested
         }
