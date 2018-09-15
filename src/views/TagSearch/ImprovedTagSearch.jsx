@@ -33,7 +33,7 @@ export default class ImprovedTagSearch extends Component {
       select_without: "",
       results: [],
     };
-    
+
     // set environment variable to 'http://localhost:9200' for testing purposes
     this.ess = new ElasticSearchService(process.env.ES_PROXY);
 
@@ -46,8 +46,10 @@ export default class ImprovedTagSearch extends Component {
 
   componentDidMount() {
     var tags = retrieveTagOptionsFromStorage();
+    let isNull = tags === null;
+    let isEmpty = Array.isArray(tags) && tags.length === 0;
     
-    if(tags === null) { 
+    if(isNull || isEmpty) {
       this.loadTagData(); 
     } else {
       this.setState({tags: tags});
@@ -199,8 +201,7 @@ export default class ImprovedTagSearch extends Component {
       tag_search_fields = <div>
         <p className="building-index">
           <i className="icon-spinner icon-spin icon-large"></i>
-          The tag filtering index is being built. 
-          The tag selectors need it, please wait a moment...
+          Loading tag data, please wait a moment...
         </p>
       </div>
     }
