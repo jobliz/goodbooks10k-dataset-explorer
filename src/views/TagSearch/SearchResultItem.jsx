@@ -11,6 +11,11 @@ export default class SearchResultItem extends Component {
     this.state = {open: false}
   }
 
+  shouldComponentUpdate(nextProps, nextState) { 
+    const changed = this.props.result.id !== nextProps.result.id;
+    return changed;
+  }
+
   render() {
     const publication_year = Math.trunc(this.props.result.original_publication_year);
     const goodreads_url = 'https://www.goodreads.com/book/show/' + this.props.result.goodreads_book_id;
