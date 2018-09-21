@@ -1,3 +1,51 @@
+"""
+Script for loading goodbooks10k data into Elasticsearch.
+
+See:
+https://hackernoon.com/elasticsearch-building-autocomplete-functionality-494fcf81a7cf
+https://www.elastic.co/guide/en/elasticsearch/reference/current/suggester-context.html
+https://stackoverflow.com/questions/33261241/bulk-insert-elasticsearch-for-autocomplete-suggestion
+https://stackoverflow.com/questions/35683069/elasticsearch-completion-suggester-context-for-nested-fields
+
+Try this search (doesn't work because 'hundred' is not complete)
+
+GET /goodbooks10k/books/_search
+{
+  "from": 0,
+  "size": 100,
+  "query": {
+    "fuzzy": {
+      "title": {
+        "value": "one+hundr",
+        "fuzziness": 2
+      }
+    }
+  }
+}
+
+And then this other, which works, using fuzziness even with a wrong search,
+also allowing for tag search (only tag inclusion, an exclude category feature
+doesn't seem to exist on elasticsearch):
+
+GET /goodbooks10k/books/_search
+{
+  "suggest": {
+    "movie-suggest-fuzzy": {
+      "prefix": "one hundrex",
+      "completion": {
+        "field": "title.completion",
+        "fuzzy": {
+          "fuzziness": 2
+        },
+        "contexts": {
+            "fuzzytags": ["magical-realism"]
+        }
+      }
+    }
+  }
+}
+"""
+
 import re
 import os
 import sys
@@ -103,7 +151,14 @@ es.indices.put_mapping(
                         "search_analyzer": "edge_ngram_search_analyzer"
                     },
                     "completion": {
-                        "type": "completion"
+                        "type": "completion",
+                        "contexts": [
+                            {
+                                "name": "fuzzytags",
+                                "type": "category",
+                                "path": "fuzzytags"
+                            }
+                        ]
                     }
                 },
                 "analyzer": "standard"
@@ -146,7 +201,8 @@ with open('./data/new_nested_tags.csv', newline='') as csvfile:
             'ratings_4': item['ratings_4'],
             'ratings_5': item['ratings_5'],
             'tag_list': tag_list,
-            'tag_nested': tag_nested
+            'tag_nested': tag_nested,
+            'fuzzytags': tag_list
         }
 
         op_dict = {
